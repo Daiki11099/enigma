@@ -19,28 +19,36 @@ int main(int argc, char *argv[])
 						 {22, 5}, {13, 7}, {7, 6}, {9, 20}, {8, 14}};
 	const int ref[26] = {6, 21, 5, 24, 3, 1, 10, 20, 13, 7, 18, 14, 9, 12, 26, 23, 22, 11, 25,
 	                     8, 2, 17, 16, 4, 19, 15};
-	char input;
+	char code; //文字の入出力
 	int ChangeRotor = 0; //何回転かを数える
 	int i; //ステップ変数
 	int num; //特定の配列の要素数を記憶するための変数
+	FILE *from, *to;
 	
-	//printf("ローター1を初期位置から26分の何回転させる？\n");
-	while (1) {
+	if (argc != 3) {
+		printf("引数が違います。プログラムを終了します\n");
+		return -1;
+	}
+	
+	if ((from = fopen(argv[1], "r")) == NULL || (to = fopen(argv[2], "w")) == NULL) {
+		printf("ファイルを正常に開けませんでした\n");
+		return -1;
+	}
+
+	while ((code = fgetc(from)) != EOF) {
+		if (code < 'a' || code > 'z') {
+			fputc(code, to);
+			continue;
+		}
 		for (i = ChangeRotor; i > 0; i--) {
 			SwapArray(rotor1);
 			if (!(ChangeRotor % 26)) SwapArray(rotor2);
 			if (!(ChangeRotor % 676)) SwapArray(rotor3);
 		}
-		do {
-			printf("1文字のアルファベットを入力して下さい: ");
-			scanf("%c", &input);
-			while ((getchar()) != '\n');
-			if (input < 'a' || input > 'z') printf("a-zまでのアルファベットを1文字入力して下さい\n");
-		} while (input < 'a' || input > 'z');
-
+		
 		//ここからローターの処理
-		num = input - 'a';
-		printf("alpha[]は%c\n", alpha[num]);
+		num = code - 'a';
+		//printf("alpha[]は%c\n", alpha[num]); 文字配列から正しい文字が取り出せているかどうか
 		//ローター1
 		num = rotor1[num][0];
 		for (i = 0; i < 26; i++) {
@@ -91,7 +99,8 @@ int main(int argc, char *argv[])
 				break;
 			}
 		}
-		printf("%c\n", alpha[num]);
+		//printf("%c\n", alpha[num]);  暗号化されているかのprintfデバッグ
+		fputc(alpha[num], to);
 		ChangeRotor++;
 	}
 }
