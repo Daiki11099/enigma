@@ -1,5 +1,7 @@
 #include <stdio.h>
 
+void SwapArray(int rotor[][2]);
+
 int main(int argc, char *argv[])
 {
 	char alpha[26]  = {'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z'};
@@ -18,69 +20,90 @@ int main(int argc, char *argv[])
 	const int ref[26] = {6, 21, 5, 24, 3, 1, 10, 20, 13, 7, 18, 14, 9, 12, 26, 23, 22, 11, 25,
 	                     8, 2, 17, 16, 4, 19, 15};
 	char input;
+	int ChangeRotor = 0; //何回転かを数える
 	int i; //ステップ変数
 	int num; //特定の配列の要素数を記憶するための変数
 	
 	//printf("ローター1を初期位置から26分の何回転させる？\n");
-	do {
-		printf("1文字のアルファベットを入力して下さい: ");
-		scanf("%c", &input);
-		while((getchar()) != '\n');
-		if (input < 'a' || input > 'z') printf("a-zまでのアルファベットを1文字入力して下さい\n");
-	} while (input < 'a' || input > 'z');
+	while (1) {
+		for (i = ChangeRotor; i > 0; i--) {
+			SwapArray(rotor1);
+			if (!(ChangeRotor % 26)) SwapArray(rotor2);
+			if (!(ChangeRotor % 676)) SwapArray(rotor3);
+		}
+		do {
+			printf("1文字のアルファベットを入力して下さい: ");
+			scanf("%c", &input);
+			while ((getchar()) != '\n');
+			if (input < 'a' || input > 'z') printf("a-zまでのアルファベットを1文字入力して下さい\n");
+		} while (input < 'a' || input > 'z');
 
-	//ここからローターの処理
-	num = input - 'a';
-	printf("alpha[]は%c\n", alpha[num]);
-	//ローター1
-	num = rotor1[num][0];
-	for (i = 0; i < 26; i++) {
-		if (rotor1[i][1] == num) {
-			num = i;
-			break;
+		//ここからローターの処理
+		num = input - 'a';
+		printf("alpha[]は%c\n", alpha[num]);
+		//ローター1
+		num = rotor1[num][0];
+		for (i = 0; i < 26; i++) {
+			if (rotor1[i][1] == num) {
+				num = i;
+				break;
+			}
+		}
+		//ローター2
+		num = rotor2[num][0];
+		for (i = 0; i < 26; i++) {
+			if (rotor2[i][1] == num) {
+				num = i;
+				break;
+			}
+		}
+		//ローター3
+		num = rotor3[num][0];
+		for (i = 0; i < 26; i++) {
+			if (rotor3[i][1] == num) {
+				num = i;
+				break;
+			}
+		}
+		//リフレクタ
+		num = ref[num] - 1;
+		//ローター3再帰
+		num = rotor3[num][1];
+		for (i = 0; i < 26; i++) {
+			if (rotor3[i][0] == num) {
+				num = i;
+				break;
+			}
+		}
+		//ローター2再帰
+		num = rotor2[num][1];
+		for (i = 0; i < 26; i++) {
+			if (rotor2[i][0] == num) {
+				num = i;
+				break;
+			}
+		}
+		//ローター1再帰
+		num = rotor1[num][1];
+		for (i = 0; i < 26; i++) {
+			if (rotor1[i][0] == num) {
+				num = i;
+				break;
+			}
+		}
+		printf("%c\n", alpha[num]);
+		ChangeRotor++;
+	}
+}
+
+void SwapArray(int rotor[][2])
+{
+	int swap;
+	for (int i = 25; i > 0; i--) {
+		for (int j = 0; j < 2; j++) {
+			 swap = rotor[i][j];
+			 rotor[i][j] = rotor[i - 1][j];
+			 rotor[i - 1][j] = swap;
 		}
 	}
-	//ローター2
-	num = rotor2[num][0];
-	for (i = 0; i < 26; i++) {
-		if (rotor2[i][1] == num) {
-			num = i;
-			break;
-		}
-	}
-	//ローター3
-	num = rotor3[num][0];
-	for (i = 0; i < 26; i++) {
-		if (rotor3[i][1] == num) {
-			num = i;
-			break;
-		}
-	}
-	//リフレクタ
-	num = ref[num] - 1;
-	//ローター3再帰
-	num = rotor3[num][1];
-	for (i = 0; i < 26; i++) {
-		if (rotor3[i][0] == num) {
-			num = i;
-			break;
-		}
-	}
-	//ローター2再帰
-	num = rotor2[num][1];
-	for (i = 0; i < 26; i++) {
-		if (rotor2[i][0] == num) {
-			num = i;
-			break;
-		}
-	}
-	//ローター1再帰
-	num = rotor1[num][1];
-	for (i = 0; i < 26; i++) {
-		if (rotor1[i][0] == num) {
-			num = i;
-			break;
-		}
-	}
-	printf("%c\n", alpha[num]);
 }
